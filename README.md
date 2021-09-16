@@ -1,1 +1,1 @@
-# shared_mysterybox.gsc
+# shared_mysterybox

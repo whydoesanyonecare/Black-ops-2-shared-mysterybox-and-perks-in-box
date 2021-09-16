@@ -255,7 +255,6 @@ custom_treasure_chest_think()
 		}
 		timeout_time = 105;
 		grabber = user;
-		self.buyer = user;
 		for( i=0;i<105;i++ )
 		{
 			if(user meleeButtonPressed() && isplayer( user ) && distance(self.origin, user.origin) <= 70)

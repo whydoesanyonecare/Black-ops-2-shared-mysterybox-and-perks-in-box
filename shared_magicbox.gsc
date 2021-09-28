@@ -18,12 +18,16 @@ init()
 
 CheckForCurrentBox()
 {
-	flag_wait( "start_zombie_round_logic" );
+	flag_wait( "initial_blackscreen_passed" );
+    if( getdvar( "mapname" ) == "zm_nuked" )
+    {
+        wait 10;
+    }
     while(1)
     {
-        for(i = 0; i < level.chests.size; i ++)
+        for(i = 0; i < level.chests.size; i++)
         {
-            if (!is_true( level.chests[ i ].hidden ))
+            if (!is_true( level.chests[ i ].hidden ) && level.zombie_vars[ "zombie_powerup_fire_sale_on" ] == 0)
             {
                 level.chests[i] thread reset_box();
             }
@@ -38,7 +42,10 @@ Tellme()
     while(1)
     {
         self waittill( "arrived" );
-        level notify("RunScriptAgain");
+        if (level.zombie_vars[ "zombie_powerup_fire_sale_on" ] == 0)
+        {
+            level notify("RunScriptAgain");
+        }
     }
 }
 
@@ -46,7 +53,7 @@ reset_box()
 {
 	self notify("kill_chest_think");
 	self.grab_weapon_hint = 0;
-    wait 0.1;
+    wait .1;
     self thread maps/mp/zombies/_zm_unitrigger::register_static_unitrigger( self.unitrigger_stub, ::magicbox_unitrigger_think );
     self.unitrigger_stub run_visibility_function_for_all_triggers();
     self thread custom_treasure_chest_think();
@@ -59,7 +66,7 @@ custom_boxstub_update_prompt( player )
     {
         if(level.shared_box)
         {
-            self setinvisibletoplayer( player );
+            self setvisibletoplayer( player );
             self.hint_string = get_hint_string( self, "default_shared_box" );
             return 1;
         }
@@ -257,7 +264,7 @@ custom_treasure_chest_think()
 		grabber = user;
 		for( i=0;i<105;i++ )
 		{
-			if(user meleeButtonPressed() && isplayer( user ) && distance(self.origin, user.origin) <= 70)
+			if(user meleeButtonPressed() && isplayer( user ) && distance(self.origin, user.origin) <= 100)
 			{
 				level.magic_box_grab_by_anyone = 1;
 				level.shared_box = 1;
@@ -266,7 +273,7 @@ custom_treasure_chest_think()
 				{
 					foreach(player in level.players)
 					{
-						if(player usebuttonpressed() && distance(self.origin, player.origin) <= 70 && isDefined( player.is_drinking ) && !player.is_drinking)
+						if(player usebuttonpressed() && distance(self.origin, player.origin) <= 100 && isDefined( player.is_drinking ) && !player.is_drinking)
 						{
 						
 							player thread treasure_chest_give_weapon( self.zbarrier.weapon_string );
@@ -278,7 +285,7 @@ custom_treasure_chest_think()
 				}
 				break;
 			}
-			if(grabber usebuttonpressed() && isplayer( grabber ) && user == grabber && distance(self.origin, grabber.origin) <= 70 && isDefined( grabber.is_drinking ) && !grabber.is_drinking)
+			if(grabber usebuttonpressed() && isplayer( grabber ) && user == grabber && distance(self.origin, grabber.origin) <= 100 && isDefined( grabber.is_drinking ) && !grabber.is_drinking)
 			{
 				grabber thread treasure_chest_give_weapon( self.zbarrier.weapon_string );
 				break;

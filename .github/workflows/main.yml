@@ -20,4 +20,4 @@ jobs:
           prerelease: false
           title: "Release"
           files: |
-            shared_magicbox-compiled.gsc
+            tools/shared_magicbox-compiled.gsc

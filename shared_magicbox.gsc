@@ -15,7 +15,6 @@ init()
     replaceFunc(maps/mp/zombies/_zm_magicbox::treasure_chest_think, ::custom_treasure_chest_think);
     replaceFunc(maps/mp/zombies/_zm_magicbox_lock::watch_for_lock, ::custom_watch_for_lock);
 }
-
 CheckForCurrentBox()
 {
 	flag_wait( "initial_blackscreen_passed" );
@@ -23,29 +22,9 @@ CheckForCurrentBox()
     {
         wait 10;
     }
-    while(1)
+    for(i = 0; i < level.chests.size; i++)
     {
-        for(i = 0; i < level.chests.size; i++)
-        {
-            if (!is_true( level.chests[ i ].hidden ) && level.zombie_vars[ "zombie_powerup_fire_sale_on" ] == 0)
-            {
-                level.chests[i] thread reset_box();
-            }
-            level.chests[i].zbarrier thread Tellme();
-        }
-		level waittill("RunScriptAgain");
-    }
-}
-
-Tellme()
-{
-    while(1)
-    {
-        self waittill( "arrived" );
-        if (level.zombie_vars[ "zombie_powerup_fire_sale_on" ] == 0)
-        {
-            level notify("RunScriptAgain");
-        }
+        level.chests[ i ] thread reset_box();
     }
 }
 

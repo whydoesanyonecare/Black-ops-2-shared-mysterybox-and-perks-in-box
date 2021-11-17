@@ -15,6 +15,7 @@ init()
     replaceFunc(maps/mp/zombies/_zm_magicbox::treasure_chest_think, ::custom_treasure_chest_think);
     replaceFunc(maps/mp/zombies/_zm_magicbox_lock::watch_for_lock, ::custom_watch_for_lock);
 }
+
 CheckForCurrentBox()
 {
 	flag_wait( "initial_blackscreen_passed" );
@@ -31,10 +32,13 @@ CheckForCurrentBox()
 reset_box()
 {
 	self notify("kill_chest_think");
-	self.grab_weapon_hint = 0;
     wait .1;
-    self thread maps/mp/zombies/_zm_unitrigger::register_static_unitrigger( self.unitrigger_stub, ::magicbox_unitrigger_think );
-    self.unitrigger_stub run_visibility_function_for_all_triggers();
+    if(!self.hidden)
+    {
+	self.grab_weapon_hint = 0;
+	self thread maps/mp/zombies/_zm_unitrigger::register_static_unitrigger( self.unitrigger_stub, ::magicbox_unitrigger_think );
+    	self.unitrigger_stub run_visibility_function_for_all_triggers();	
+ 	}
     self thread custom_treasure_chest_think();
 }
 

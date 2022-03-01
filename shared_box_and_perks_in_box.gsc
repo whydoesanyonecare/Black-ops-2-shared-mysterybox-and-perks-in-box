@@ -12,6 +12,55 @@ init()
     level.shared_box = 0;
     add_zombie_hint( "default_shared_box", "Hold ^3&&1^7 for weapon");
     level.perks_in_box_enabled = getdvarintdefault("perks_in_box", 1);
+    flag_wait( "initial_blackscreen_passed" );
+    thread setperklimit();
+}
+
+setperklimit()
+{
+    level endon("end_game");
+    for(;;)
+    {
+        set_perk_limit(getdvar("mapname"));
+        level waittill("connected", player);
+    }
+}
+
+set_perk_limit(map)
+{
+    if ( !isDefined( map ) )
+	{
+		return 0;
+	}
+    switch(map)
+    {
+        case "zm_transit":
+            if(get_players().size > 1)
+            {
+                limit = 6;
+            }
+            else
+            {
+                limit = 5;
+            }
+            break;
+        case "zm_prison":
+            limit = 5;
+            break;
+        case "zm_nuked":
+            limit = 4;
+            break;
+        case "zm_tomb":
+            limit = 9;
+            break;
+        case "zm_buried":
+            limit = 7;
+            break;
+        case "zm_highrise":
+            limit = 6;
+            break;
+    }
+    level.perk_purchase_limit = limit;
 }
 
 CheckForCurrentBox()
@@ -808,6 +857,7 @@ pers_treasure_chest_choosespecialweapon( player )
 	}
 }
 
+/*
 custom_treasure_chest_chooseweightedrandomweapon( player )
 {
     level.box_perks = randomintrange(0,5);
@@ -873,6 +923,180 @@ custom_treasure_chest_chooseweightedrandomweapon( player )
 	while ( i < keys.size )
 	{
         if(level.box_perks == 0 && player.num_perks < level.perk_purchase_limit)
+        {
+            if( treasure_chest_canplayerreceiveperk( player, keys[ i ] ) )
+            {
+                return keys[ i ];
+            }
+        }
+        else
+        {
+            if( treasure_chest_canplayerreceiveweapon( player, keys[ i ], pap_triggers ) )
+            {
+                return keys[ i ];
+            }
+        }
+		i++;
+	}
+	return keys[ 0 ];
+}*/
+
+custom_treasure_chest_chooseweightedrandomweapon( player )
+{
+    level.box_perks = randomintrange(0,5);
+	zombie_perks = [];
+    if(level.box_perks == 0 && player.num_perks < level.perk_purchase_limit && level.perks_in_box_enabled)
+    {  
+		if(!player hasperk("specialty_rof"))
+		{
+        	zombie_perks[zombie_perks.size] = "zombie_perk_bottle_doubletap";
+		}
+		if(!player hasperk("specialty_armorvest"))
+		{
+        	zombie_perks[zombie_perks.size] = "zombie_perk_bottle_jugg";
+		}
+		if(!player hasperk("specialty_fastreload"))
+		{
+        	zombie_perks[zombie_perks.size] = "zombie_perk_bottle_sleight";
+		}
+		//zombie_perks[zombie_perks.size] = "zombie_perk_bottle_jugg";
+        //zombie_perks[zombie_perks.size] = "zombie_perk_bottle_sleight";
+        if(getdvar("mapname") == "zm_transit")
+        {
+			if(!player hasperk("specialty_quickrevive"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_revive";
+			}
+			if(!player hasperk("specialty_longersprint"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_marathon";
+			}
+		    //zombie_perks[zombie_perks.size] = "zombie_perk_bottle_revive";		    
+		    //zombie_perks[zombie_perks.size] = "zombie_perk_bottle_marathon";
+            if(get_players().size > 1 && !player hasperk("specialty_scavenger") )
+            {
+		        zombie_perks[zombie_perks.size] = "zombie_perk_bottle_tombstone";
+            }
+        }
+        if(getdvar("mapname") == "zm_prison")
+        {
+			if(!player hasperk("specialty_deadshot"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_deadshot";
+			}
+			if(!player hasperk("specialty_grenadepulldeath"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_cherry";
+			}
+            //zombie_perks[zombie_perks.size] = "zombie_perk_bottle_deadshot";
+            //zombie_perks[zombie_perks.size] = "zombie_perk_bottle_cherry";
+		    
+        }
+        if(getdvar("mapname") == "zm_nuked")
+        {
+			if(!player hasperk("specialty_quickrevive"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_revive";
+			}
+		    //zombie_perks[zombie_perks.size] = "zombie_perk_bottle_revive";		    
+        }
+        if(getdvar("mapname") == "zm_tomb")
+        {
+			if(!player hasperk("specialty_deadshot"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_deadshot";
+			}
+			if(!player hasperk("specialty_grenadepulldeath"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_cherry";
+			}
+			if(!player hasperk("specialty_flakjacket"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_nuke";
+			}
+			if(!player hasperk("specialty_quickrevive"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_revive";
+			}
+			if(!player hasperk("specialty_longersprint"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_marathon";
+			}
+			if(!player hasperk("specialty_additionalprimaryweapon"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_additionalprimaryweapon";
+			}
+            /*zombie_perks[zombie_perks.size] = "zombie_perk_bottle_deadshot";
+            zombie_perks[zombie_perks.size] = "zombie_perk_bottle_cherry";
+            zombie_perks[zombie_perks.size] = "zombie_perk_bottle_nuke";
+            zombie_perks[zombie_perks.size] = "zombie_perk_bottle_revive";
+            zombie_perks[zombie_perks.size] = "zombie_perk_bottle_marathon";
+            zombie_perks[zombie_perks.size] = "zombie_perk_bottle_additionalprimaryweapon";
+			*/
+		}
+        if(getdvar("mapname") == "zm_buried")
+        {
+			if(!player hasperk("specialty_nomotionsensor"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_vulture";
+			}
+			if(!player hasperk("specialty_quickrevive"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_revive";
+			}
+			if(!player hasperk("specialty_deadshot"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_marathon";
+			}
+			if(!player hasperk("specialty_additionalprimaryweapon"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_additionalprimaryweapon";
+			}
+            /*
+			zombie_perks[zombie_perks.size] = "zombie_perk_bottle_vulture";
+            zombie_perks[zombie_perks.size] = "zombie_perk_bottle_revive";
+            zombie_perks[zombie_perks.size] = "zombie_perk_bottle_marathon";
+            zombie_perks[zombie_perks.size] = "zombie_perk_bottle_additionalprimaryweapon";
+			*/
+		}
+        if(getdvar("mapname") == "zm_highrise")
+        {
+			if(!player hasperk("specialty_quickrevive"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_revive";
+			}
+			if(!player hasperk("specialty_additionalprimaryweapon"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_additionalprimaryweapon";
+			}
+			if(!player hasperk("specialty_finalstand"))
+			{
+				zombie_perks[zombie_perks.size] = "zombie_perk_bottle_whoswho";
+			}
+			/*
+            zombie_perks[zombie_perks.size] = "zombie_perk_bottle_revive";
+            zombie_perks[zombie_perks.size] = "zombie_perk_bottle_additionalprimaryweapon";
+            zombie_perks[zombie_perks.size] = "zombie_perk_bottle_whoswho";
+			*/
+		}
+    }
+	if(zombie_perks.size > 0)
+	{
+		keys = array_randomize( zombie_perks );
+	}
+    else
+    {
+    	keys = array_randomize( getarraykeys( level.zombie_weapons ) );
+    }
+	if ( isDefined( level.customrandomweaponweights ) )
+	{
+		keys = player [[ level.customrandomweaponweights ]]( keys );
+	}
+	pap_triggers = getentarray( "specialty_weapupgrade", "script_noteworthy" );
+	i = 0;
+	while ( i < keys.size )
+	{
+        if( zombie_perks.size > 0 )
         {
             if( treasure_chest_canplayerreceiveperk( player, keys[ i ] ) )
             {

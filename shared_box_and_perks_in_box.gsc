@@ -644,9 +644,9 @@ treasure_chest_weapon_spawn( chest, player, respin )
 	{
 		self.weapon_model_dw = spawn_weapon_model( rand, get_left_hand_weapon_model_name( rand ), self.weapon_model.origin - vectorScale( ( 0, 1, 0 ), 3 ), self.weapon_model.angles );
 	}
-	if ( getDvar( "magic_chest_movable" ) == "1" && isDefined( chest._box_opened_by_fire_sale ) && !chest._box_opened_by_fire_sale /*&& isDefined( level.zombie_vars[ "zombie_powerup_fire_sale_on" ] ) && level.zombie_vars[ "zombie_powerup_fire_sale_on" ] && !( self [[ level._zombiemode_check_firesale_loc_valid_func ]]() )*/ )
+    if ( getDvar( "magic_chest_movable" ) == "1" && !( isdefined( chest._box_opened_by_fire_sale ) && chest._box_opened_by_fire_sale ) && !( isdefined( level.zombie_vars["zombie_powerup_fire_sale_on"] ) && level.zombie_vars["zombie_powerup_fire_sale_on"] && self [[ level._zombiemode_check_firesale_loc_valid_func ]]() ) )
 	{
-		random = randomint( 100 );
+    	random = randomint( 100 );
 		if ( !isDefined( level.chest_min_move_usage ) )
 		{
 			level.chest_min_move_usage = 4;
@@ -721,7 +721,7 @@ treasure_chest_weapon_spawn( chest, player, respin )
 		}
 	}
 	self notify( "randomization_done" );
-	if ( flag( "moving_chest_now" ) /*&& level.zombie_vars[ "zombie_powerup_fire_sale_on" ] && !( self [[ level._zombiemode_check_firesale_loc_valid_func ]]() )*/ )
+	if ( flag( "moving_chest_now" ) && !( level.zombie_vars["zombie_powerup_fire_sale_on"] && self [[ level._zombiemode_check_firesale_loc_valid_func ]]() ) )
 	{
 		if ( isDefined( level.chest_joker_custom_movement ) )
 		{

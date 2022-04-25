@@ -17,7 +17,7 @@ init()
 CheckForCurrentBox()
 {
 	flag_wait( "initial_blackscreen_passed" );
-    if( getdvar( "mapname" ) == "zm_nuked" )
+    if( getdvar( "mapname" ) == "zm_nuked" || getdvar( "mapname" ) == "zm_tomb" )
     {
         wait 10;
     }

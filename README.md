@@ -1,6 +1,6 @@
 # Black ops 2 Version of Shared Mystery box
 
-# Share Mysterybox
+* Share Mysterybox
 
 ![kuva](https://user-images.githubusercontent.com/77815199/167411162-cb828c87-9f27-4a4c-9800-ac7578e83f37.png)
 
@@ -10,7 +10,7 @@
 
 - T6_zombies_shared_magicbox.gsc should work on any version of bo2 zombies.
 
-# Shared box and Perks in box
+* Shared box and Perks in box
 
 ![kuva](https://user-images.githubusercontent.com/77815199/167411290-6079623a-901d-4951-a21f-f33b853ae769.png)
 

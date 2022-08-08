@@ -8,12 +8,40 @@
 #include maps/mp/zombies/_zm_utility;
 init()
 {
-	thread CheckForCurrentBox();
+	if(getdvar( "mapname" ) == "zm_tomb" )
+    	thread monitor_boxes();
+    else
+        thread CheckForCurrentBox();
+
     level.shared_box = 0;
     add_zombie_hint( "default_shared_box", "Hold ^3&&1^7 for weapon");
     level.perks_in_box_enabled = getdvarintdefault("perks_in_box", 1);
     flag_wait( "initial_blackscreen_passed" );
     thread setperklimit();
+}
+
+monitor_boxes()
+{
+	flag_wait( "initial_blackscreen_passed" );
+    wait 10;
+    for(i = 0; i < level.chests.size; i++)
+    {
+        level.chests[ i ] thread reset_box();		
+	}
+    for(;;)
+    {
+        for(i = 0; i < level.chests.size; i++)
+        {
+            if(!level.chests[ i ].hidden)
+            {
+                level.chests[ i ].unitrigger_stub.prompt_and_visibility_func = ::boxtrigger_update_prompt;
+                level.chests[ i ].zbarrier waittill( "left" );
+                //iPrintLn("left");
+            }
+        }
+        wait 15;
+        //iPrintLn("15");
+	}
 }
 
 setperklimit()

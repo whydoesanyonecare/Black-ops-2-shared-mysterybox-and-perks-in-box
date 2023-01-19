@@ -17,7 +17,7 @@ init()
     add_zombie_hint( "default_shared_box", "Hold ^3&&1^7 for weapon");
     level.perks_in_box_enabled = getdvarintdefault("perks_in_box", 1);
     flag_wait( "initial_blackscreen_passed" );
-    thread setperklimit();
+    //thread setperklimit();
 }
 
 monitor_boxes()
@@ -271,9 +271,8 @@ custom_treasure_chest_think()
 		}
 		reduced_cost = undefined;
 		if ( is_player_valid( user ) && user maps/mp/zombies/_zm_pers_upgrades_functions::is_pers_double_points_active() )
-		{
 			reduced_cost = int( self.zombie_cost / 2 );
-		}
+		
 		if ( isdefined( level.using_locked_magicbox ) && level.using_locked_magicbox && isdefined( self.is_locked ) && self.is_locked ) 
 		{
 			if ( user.score >= level.locked_magic_box_cost )
@@ -283,9 +282,8 @@ custom_treasure_chest_think()
 				self.unitrigger_stub run_visibility_function_for_all_triggers();
 			}
 			else
-			{
 				user maps/mp/zombies/_zm_audio::create_and_play_dialog( "general", "no_money_box" );
-			}
+			
 			wait 0.1 ;
 			continue;
 		}
@@ -297,9 +295,8 @@ custom_treasure_chest_think()
 				user_cost = self.zombie_cost;
 			}
 			else
-			{
 				user_cost = 0;
-			}
+			
 			self.chest_user = user;
 			break;
 		}
@@ -331,25 +328,21 @@ custom_treasure_chest_think()
 	user maps/mp/zombies/_zm_stats::increment_client_stat( "use_magicbox" );
 	user maps/mp/zombies/_zm_stats::increment_player_stat( "use_magicbox" );
 	if ( isDefined( level._magic_box_used_vo ) )
-	{
 		user thread [[ level._magic_box_used_vo ]]();
-	}
+	
 	self thread watch_for_emp_close();
 	if ( isDefined( level.using_locked_magicbox ) && level.using_locked_magicbox )
-	{
 		self thread maps/mp/zombies/_zm_magicbox_lock::watch_for_lock();
-	}
+	
 	self._box_open = 1;
 	level.box_open = 1;
 	self._box_opened_by_fire_sale = 0;
 	if ( isDefined( level.zombie_vars[ "zombie_powerup_fire_sale_on" ] ) && level.zombie_vars[ "zombie_powerup_fire_sale_on" ] && !isDefined( self.auto_open ) && self [[ level._zombiemode_check_firesale_loc_valid_func ]]() )
-	{
 		self._box_opened_by_fire_sale = 1;
-	}
+	
 	if ( isDefined( self.chest_lid ) )
-	{
 		self.chest_lid thread treasure_chest_lid_open();
-	}
+	
 	if ( isDefined( self.zbarrier ) )
 	{
 		play_sound_at_pos( "open_chest", self.origin );
@@ -363,13 +356,10 @@ custom_treasure_chest_think()
 	thread maps/mp/zombies/_zm_unitrigger::unregister_unitrigger( self.unitrigger_stub );
 	self.zbarrier waittill_any( "randomization_done", "box_hacked_respin" );
 	if ( flag( "moving_chest_now" ) && !self._box_opened_by_fire_sale && isDefined( user_cost ) )
-	{
 		user maps/mp/zombies/_zm_score::add_to_player_score( user_cost, 0 );
-	}
+	
 	if ( flag( "moving_chest_now" ) && !level.zombie_vars[ "zombie_powerup_fire_sale_on" ] && !self._box_opened_by_fire_sale )
-	{
 		self thread treasure_chest_move( self.chest_user );
-	}
 	else
 	{
 		self.grab_weapon_hint = 1;
@@ -377,9 +367,8 @@ custom_treasure_chest_think()
 		self.chest_user = user;
 		thread maps/mp/zombies/_zm_unitrigger::register_static_unitrigger( self.unitrigger_stub, ::magicbox_unitrigger_think );
 		if ( isDefined( self.zbarrier ) && !is_true( self.zbarrier.closed_by_emp ) )
-		{
 			self thread treasure_chest_timeout();
-		}
+		
 		timeout_time = 105;
 		grabber = user;
 		for( i=0;i<105;i++ )
@@ -397,134 +386,50 @@ custom_treasure_chest_think()
 				{
 					foreach(player in level.players)
 					{
-						if(player usebuttonpressed() && distance(self.origin, player.origin) <= 100 && isDefined( player.is_drinking ) && !player.is_drinking)
+						if(!player can_buy() && player usebuttonpressed())
 						{
-							if(level.box_perks == 0 && level.perk_pick == 1)
+							wait .1;
+							continue;
+						}
+						else if(player usebuttonpressed() && distance(self.origin, player.origin) <= 100 && isDefined( player.is_drinking ) && !player.is_drinking)
+                        {
+                            if(level.box_perks == 0 && level.perk_pick == 1)
                             {
                                 player playsound( "zmb_cha_ching" );
-                                if(self.zbarrier.weapon_string == "zombie_perk_bottle_revive" )
-                                {
-                                    player thread DoGivePerk("specialty_quickrevive");
-                                }
-                                if(self.zbarrier.weapon_string == "zombie_perk_bottle_sleight")
-                                {
-                                    player thread DoGivePerk("specialty_fastreload");
-                                }
-                                if(self.zbarrier.weapon_string == "zombie_perk_bottle_doubletap" )
-                                {
-                                    player thread DoGivePerk("specialty_rof");
-                                }
-                                if(self.zbarrier.weapon_string == "zombie_perk_bottle_jugg")
-                                {
-                                    player thread DoGivePerk("specialty_armorvest");
-                                }
-                                if(self.zbarrier.weapon_string == "zombie_perk_bottle_marathon" )
-                                {
-                                    player thread DoGivePerk("specialty_longersprint");
-                                }
-                                if(self.zbarrier.weapon_string == "zombie_perk_bottle_tombstone")
-                                {
-                                    player thread DoGivePerk("specialty_scavenger");
-                                }
-                                if(self.zbarrier.weapon_string == "zombie_perk_bottle_deadshot" )
-                                {
-                                    player thread DoGivePerk("specialty_deadshot");
-                                }
-                                if(self.zbarrier.weapon_string == "zombie_perk_bottle_cherry")
-                                {
-                                    player thread DoGivePerk("specialty_grenadepulldeath");
-                                }
-                                if(self.zbarrier.weapon_string == "zombie_perk_bottle_nuke" )
-                                {
-                                    player thread DoGivePerk("specialty_flakjacket");
-                                }
-                                if(self.zbarrier.weapon_string == "zombie_perk_bottle_additionalprimaryweapon")
-                                {
-                                    player thread DoGivePerk("specialty_additionalprimaryweapon");
-                                }
-                                if(self.zbarrier.weapon_string == "zombie_perk_bottle_vulture" )
-                                {
-                                    player thread DoGivePerk("specialty_nomotionsensor");
-                                }
-                                if(self.zbarrier.weapon_string == "zombie_perk_bottle_whoswho")
-                                {
-                                    player thread DoGivePerk("specialty_finalstand");
-                                }
+                                self give_perk_bottle(player);
                             }
                             else
-                            {
                                 player thread treasure_chest_give_weapon( self.zbarrier.weapon_string );
-                            }
+                            
                             a = 105;
-							break;
-						}
+                            break;
+                        }
 					}
-					wait 0.1;
+					wait .1;
 				}
 				break;
 			}
-			if(grabber usebuttonpressed() && isplayer( grabber ) && user == grabber && distance(self.origin, grabber.origin) <= 100 && isDefined( grabber.is_drinking ) && !grabber.is_drinking)
-			{
+		
+            else if(!grabber can_buy() && grabber usebuttonpressed())
+            {
+                wait .1;
+                continue;
+            }
+            else if(grabber usebuttonpressed() && isplayer( grabber ) && user == grabber && distance(self.origin, grabber.origin) <= 100 )
+            {
                 if(level.box_perks == 0 && level.perk_pick == 1)
                 {
                     grabber playsound( "zmb_cha_ching" );
-                    if(self.zbarrier.weapon_string == "zombie_perk_bottle_revive" )
-                    {
-                        grabber thread DoGivePerk("specialty_quickrevive");
-                    }
-                    if(self.zbarrier.weapon_string == "zombie_perk_bottle_sleight")
-                    {
-                        grabber thread DoGivePerk("specialty_fastreload");
-                    }
-                    if(self.zbarrier.weapon_string == "zombie_perk_bottle_doubletap" )
-                    {
-                        grabber thread DoGivePerk("specialty_rof");
-                    }
-                    if(self.zbarrier.weapon_string == "zombie_perk_bottle_jugg")
-                    {
-                        grabber thread DoGivePerk("specialty_armorvest");
-                    }
-                    if(self.zbarrier.weapon_string == "zombie_perk_bottle_marathon" )
-                    {
-                        grabber thread DoGivePerk("specialty_longersprint");
-                    }
-                    if(self.zbarrier.weapon_string == "zombie_perk_bottle_tombstone")
-                    {
-                        grabber thread DoGivePerk("specialty_scavenger");
-                    }
-                    if(self.zbarrier.weapon_string == "zombie_perk_bottle_deadshot" )
-                    {
-                        grabber thread DoGivePerk("specialty_deadshot");
-                    }
-                    if(self.zbarrier.weapon_string == "zombie_perk_bottle_cherry")
-                    {
-                        grabber thread DoGivePerk("specialty_grenadepulldeath");
-                    }
-                    if(self.zbarrier.weapon_string == "zombie_perk_bottle_nuke" )
-                    {
-                        grabber thread DoGivePerk("specialty_flakjacket");
-                    }
-                    if(self.zbarrier.weapon_string == "zombie_perk_bottle_additionalprimaryweapon")
-                    {
-                        grabber thread DoGivePerk("specialty_additionalprimaryweapon");
-                    }
-                    if(self.zbarrier.weapon_string == "zombie_perk_bottle_vulture" )
-                    {
-                        grabber thread DoGivePerk("specialty_nomotionsensor");
-                    }
-                    if(self.zbarrier.weapon_string == "zombie_perk_bottle_whoswho")
-                    {
-                        grabber thread DoGivePerk("specialty_finalstand");
-                    }
+                    self give_perk_bottle(grabber);
                 }
-				else
-                {
+                else
                     grabber thread treasure_chest_give_weapon( self.zbarrier.weapon_string );
-                }
+                
                 break;
-			}
-			wait 0.1;
-		}
+            }
+            wait .1;
+        }
+
 		fx_obj delete();
 		fx Delete();
 		self.weapon_out = undefined;
@@ -533,18 +438,15 @@ custom_treasure_chest_think()
 		self.grab_weapon_hint = 0;
 		self.zbarrier notify( "weapon_grabbed" );
 		if ( isDefined( self._box_opened_by_fire_sale ) && !self._box_opened_by_fire_sale )
-		{
 			level.chest_accessed += 1;
-		}
+		
 		if ( level.chest_moves > 0 && isDefined( level.pulls_since_last_ray_gun ) )
-		{
 			level.pulls_since_last_ray_gun += 1;
-		}
+		
 		thread maps/mp/zombies/_zm_unitrigger::unregister_unitrigger( self.unitrigger_stub );
 		if ( isDefined( self.chest_lid ) )
-		{
 			self.chest_lid thread treasure_chest_lid_close( self.timedout );
-		}
+
 		if ( isDefined( self.zbarrier ) )
 		{
 			self.zbarrier set_magic_box_zbarrier_state( "close" );
@@ -553,13 +455,10 @@ custom_treasure_chest_think()
 			wait 1;
 		}
 		else
-		{
 			wait 3;
-		}
+		
 		if ( isDefined( level.zombie_vars[ "zombie_powerup_fire_sale_on" ] ) && level.zombie_vars[ "zombie_powerup_fire_sale_on" ] || self [[ level._zombiemode_check_firesale_loc_valid_func ]]() || self == level.chests[ level.chest_index ] )
-		{
 			thread maps/mp/zombies/_zm_unitrigger::register_static_unitrigger( self.unitrigger_stub, ::magicbox_unitrigger_think );
-		}
 	}
     level.perk_pick = 0;
 	self._box_open = 0;
@@ -570,6 +469,45 @@ custom_treasure_chest_think()
 	self.chest_user = undefined;
 	self notify( "chest_accessed" );
 	self thread custom_treasure_chest_think();
+}
+
+give_perk_bottle(player)
+{
+	if(self.zbarrier.weapon_string == "zombie_perk_bottle_revive" )
+		player thread DoGivePerk("specialty_quickrevive");
+
+	if(self.zbarrier.weapon_string == "zombie_perk_bottle_sleight")
+		player thread DoGivePerk("specialty_fastreload");
+
+	if(self.zbarrier.weapon_string == "zombie_perk_bottle_doubletap" )
+		player thread DoGivePerk("specialty_rof");
+
+	if(self.zbarrier.weapon_string == "zombie_perk_bottle_jugg")
+		player thread DoGivePerk("specialty_armorvest");
+
+	if(self.zbarrier.weapon_string == "zombie_perk_bottle_marathon" )
+		player thread DoGivePerk("specialty_longersprint");
+
+	if(self.zbarrier.weapon_string == "zombie_perk_bottle_tombstone")
+		player thread DoGivePerk("specialty_scavenger");
+
+	if(self.zbarrier.weapon_string == "zombie_perk_bottle_deadshot" )
+		player thread DoGivePerk("specialty_deadshot");
+
+	if(self.zbarrier.weapon_string == "zombie_perk_bottle_cherry")
+		player thread DoGivePerk("specialty_grenadepulldeath");
+
+	if(self.zbarrier.weapon_string == "zombie_perk_bottle_nuke" )
+		player thread DoGivePerk("specialty_flakjacket");
+
+	if(self.zbarrier.weapon_string == "zombie_perk_bottle_additionalprimaryweapon")
+		player thread DoGivePerk("specialty_additionalprimaryweapon");
+
+	if(self.zbarrier.weapon_string == "zombie_perk_bottle_vulture" )
+		player thread DoGivePerk("specialty_nomotionsensor");
+
+	if(self.zbarrier.weapon_string == "zombie_perk_bottle_whoswho")
+		player thread DoGivePerk("specialty_finalstand");
 }
 
 custom_watch_for_lock()
@@ -1141,4 +1079,31 @@ doGivePerk(perk)
             return;
         self notify("burp");
     }
+}
+
+can_buy()
+{
+	if ( isDefined( self.is_drinking ) && self.is_drinking > 0)
+		return 0;
+	if ( self IsSwitchingWeapons() )
+		return 0;
+	if ( self isthrowinggrenade() )
+		return 0;
+	if ( self maps/mp/zombies/_zm_laststand::player_is_in_laststand() )
+		return 0;
+	current_weapon = self getcurrentweapon();
+	if ( is_placeable_mine( current_weapon ) || is_equipment_that_blocks_purchase( current_weapon ) || is_equipment( current_weapon ) )
+		return 0;
+	if ( self in_revive_trigger() || level.revive_tool == current_weapon )
+		return 0;
+	if ( current_weapon == "none" )
+		return 0;
+	if ( self hacker_active() )
+		return 0;
+	if ( !is_player_valid( self ) )
+		return 0;
+	if ( self isreloading() )
+        return 0;
+
+	return 1;
 }
